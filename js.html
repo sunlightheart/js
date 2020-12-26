@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@300&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" href="css/style.css">
+
+    <title>Photos</title>
+</head>
+<body>
+    <header>
+        <h1>Photos</h1>
+    </header>
+
+    <div class="container">
+        <div id="img_unit">
+        </div>
+    </div>
+
+    <script>
+        var images = [
+            {
+                "path": "img/img01.jpg",
+                "name": "name01",
+                "caption": "comment1"
+            },
+            {
+                "path": "img/img02.jpg",
+                "name": "name02",
+                "caption": "comment2"
+            },
+            {
+                "path": "img/img03.jpg",
+                "name": "name03",
+                "caption": "comment3"
+            }
+        ];
+
+        var img;
+        var caption;
+        var div;
+
+        for(var i=0; i<images.length; i++){
+            img = document.createElement('img')
+            img.setAttribute('src', images[i].path);
+
+            caption = document.createElement('div');
+            caption.className = 'inner';
+            caption.innerHTML = '<p>' + images[i].caption + '<span>' + images[i].name + '</span></p>';
+
+            div = document.createElement('div');
+            div.className = 'photo';
+            div.appendChild(img);
+            div.appendChild(caption);
+
+            document.getElementById('img_unit').appendChild(div);
+        }
+//        alert(images[0].caption)
+    </script>
+</body>
+</html>
