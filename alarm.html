@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#ff4d00">
+
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@300;700&display=swap" rel="stylesheet">
+
+    <title>熱血アラーム</title>
+
+    <style>
+        *{ box-sizing: border-box; }
+
+        body{
+            margin: 0;
+            padding: 0;
+            background-color: #111;
+            font-family: 'Open Sans Condensed', sans-serif;
+            color: #fff;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .phone{
+            max-width: 420px;
+            min-height: 100vh;
+            margin: 0 auto;
+            background: #1c1c1e;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header{
+            background-color: #ff4d00;
+            color: #fff;
+            width: 100%;
+            padding: env(safe-area-inset-top, 0) 0 0;
+        }
+
+        header h1{
+            margin: 0;
+            font-size: 25px;
+            padding: 14px 5px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .clock{
+            text-align: center;
+            padding: 30px 20px 10px;
+        }
+
+        .clock .now{
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .clock .today{
+            font-size: 14px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .container{
+            padding: 10px 16px 100px;
+        }
+
+        .section-title{
+            font-size: 16px;
+            color: #999;
+            margin: 20px 0 8px;
+            padding: 0 4px;
+        }
+
+        .alarm-card{
+            background: #2c2c2e;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .alarm-card .time{
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .alarm-card .time.off{
+            color: #666;
+        }
+
+        .alarm-card .label{
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .alarm-card .actions{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .switch{
+            position: relative;
+            width: 46px;
+            height: 28px;
+            display: inline-block;
+        }
+
+        .switch input{
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch .slider{
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #555;
+            border-radius: 28px;
+            transition: .2s;
+        }
+
+        .switch .slider:before{
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #fff;
+            border-radius: 50%;
+            transition: .2s;
+        }
+
+        .switch input:checked + .slider{
+            background-color: #34c759;
+        }
+
+        .switch input:checked + .slider:before{
+            transform: translateX(18px);
+        }
+
+        .delete-btn{
+            background: none;
+            border: none;
+            color: #ff4d4d;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 2px;
+        }
+
+        .add-form{
+            background: #2c2c2e;
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .add-form input[type="time"]{
+            font-size: 24px;
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+            background: #1c1c1e;
+            color: #fff;
+        }
+
+        .add-form button{
+            background: #ff4d00;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .add-form button:active{
+            background: #cc3d00;
+        }
+
+        .empty{
+            color: #666;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        /* --- Alarm ring overlay --- */
+        .ring-overlay{
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #ff4d00;
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+            animation: flash 1s ease-in-out infinite;
+        }
+
+        .ring-overlay.show{
+            display: flex;
+        }
+
+        @keyframes flash{
+            0%, 100%{ background-color: #ff4d00; }
+            50%{ background-color: #ff8a00; }
+        }
+
+        .ring-overlay .ring-time{
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .ring-overlay .quote{
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 40px;
+        }
+
+        .ring-overlay .credit{
+            font-size: 13px;
+            opacity: .8;
+            margin-top: -30px;
+            margin-bottom: 30px;
+        }
+
+        .ring-buttons{
+            display: flex;
+            gap: 16px;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .ring-buttons button{
+            flex: 1;
+            padding: 16px;
+            border-radius: 10px;
+            border: none;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        #snoozeBtn{
+            background: rgba(255,255,255,.25);
+            color: #fff;
+        }
+
+        #stopBtn{
+            background: #fff;
+            color: #ff4d00;
+        }
+
+        footer.disclaimer{
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 420px;
+            margin: 0 auto;
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0));
+            background: #1c1c1e;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <header>
+            <h1>熱血アラーム</h1>
+        </header>
+
+        <div class="clock">
+            <div class="now" id="nowClock">00:00:00</div>
+            <div class="today" id="nowDate">----年--月--日</div>
+        </div>
+
+        <div class="container">
+            <div class="section-title">アラーム</div>
+            <div id="alarmList"></div>
+
+            <div class="section-title">アラームを追加</div>
+            <div class="add-form">
+                <input type="time" id="newTime" value="06:30">
+                <button id="addBtn">追加する</button>
+            </div>
+        </div>
+
+        <footer class="disclaimer">
+            ※本アプリの名言は松岡修造さんの語録をモチーフにしたファン制作の非公式サンプルです。
+        </footer>
+
+        <div class="ring-overlay" id="ringOverlay">
+            <div class="ring-time" id="ringTime">06:30</div>
+            <div class="quote" id="ringQuote">起きた瞬間から、もう試合は始まってるんだよ！</div>
+            <div class="credit">— 熱血格言（非公式）</div>
+            <div class="ring-buttons">
+                <button id="snoozeBtn">あと5分</button>
+                <button id="stopBtn">起きる！</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var QUOTES = [
+            '「疲れた」とか「無理」とか言ってる時間があったら、その分をどう使うか考えろ！',
+            '限界を作ってるのは、自分自身だよ。可能性を信じろ！',
+            '明日やろうは、バカ野郎！',
+            '太陽は、また昇る！！',
+            '熱くなれよ！人生は一度きりなんだから！',
+            '今できる、目の前のことを、一生懸命やるんだよ！',
+            'まだ朝だぞ！これからだろ！',
+            '起きた瞬間から、もう試合は始まってるんだよ！',
+            'できない理由を探すより、できる方法を考えろ！',
+            '一日は待ってくれない。今すぐ動け！',
+            '諦めるのは、まだ早い！さあ、布団から出よう！',
+            '昨日の自分を超えていくのは、今日の自分だ！'
+        ];
+
+        var STORAGE_KEY = 'nekketsu_alarms';
+        var alarms = [];
+        var audioCtx = null;
+        var oscillator = null;
+        var ringingAlarmId = null;
+        var lastCheckedMinute = null;
+
+        function loadAlarms(){
+            try{
+                var raw = localStorage.getItem(STORAGE_KEY);
+                alarms = raw ? JSON.parse(raw) : [];
+            }catch(e){
+                alarms = [];
+            }
+        }
+
+        function saveAlarms(){
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(alarms));
+        }
+
+        function pad(n){
+            return n < 10 ? '0' + n : '' + n;
+        }
+
+        function renderClock(){
+            var now = new Date();
+            document.getElementById('nowClock').textContent =
+                pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+            document.getElementById('nowDate').textContent =
+                now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日';
+        }
+
+        function renderAlarms(){
+            var list = document.getElementById('alarmList');
+            list.innerHTML = '';
+
+            if(alarms.length === 0){
+                var empty = document.createElement('div');
+                empty.className = 'empty';
+                empty.textContent = 'アラームがありません';
+                list.appendChild(empty);
+                return;
+            }
+
+            var sorted = alarms.slice().sort(function(a, b){
+                return a.time.localeCompare(b.time);
+            });
+
+            sorted.forEach(function(alarm){
+                var card = document.createElement('div');
+                card.className = 'alarm-card';
+
+                var left = document.createElement('div');
+                var time = document.createElement('div');
+                time.className = 'time' + (alarm.enabled ? '' : ' off');
+                time.textContent = alarm.time;
+                var label = document.createElement('div');
+                label.className = 'label';
+                label.textContent = alarm.enabled ? '有効' : '無効';
+                left.appendChild(time);
+                left.appendChild(label);
+
+                var actions = document.createElement('div');
+                actions.className = 'actions';
+
+                var switchLabel = document.createElement('label');
+                switchLabel.className = 'switch';
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = alarm.enabled;
+                checkbox.addEventListener('change', function(){
+                    alarm.enabled = checkbox.checked;
+                    saveAlarms();
+                    renderAlarms();
+                });
+                var slider = document.createElement('span');
+                slider.className = 'slider';
+                switchLabel.appendChild(checkbox);
+                switchLabel.appendChild(slider);
+
+                var delBtn = document.createElement('button');
+                delBtn.className = 'delete-btn';
+                delBtn.textContent = '✕';
+                delBtn.addEventListener('click', function(){
+                    alarms = alarms.filter(function(a){ return a.id !== alarm.id; });
+                    saveAlarms();
+                    renderAlarms();
+                });
+
+                actions.appendChild(switchLabel);
+                actions.appendChild(delBtn);
+
+                card.appendChild(left);
+                card.appendChild(actions);
+                list.appendChild(card);
+            });
+        }
+
+        function addAlarm(){
+            var input = document.getElementById('newTime');
+            if(!input.value) return;
+
+            alarms.push({
+                id: Date.now(),
+                time: input.value,
+                enabled: true
+            });
+            saveAlarms();
+            renderAlarms();
+        }
+
+        function randomQuote(){
+            return QUOTES[Math.floor(Math.random() * QUOTES.length)];
+        }
+
+        function startBeep(){
+            if(audioCtx) return;
+            try{
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                oscillator = audioCtx.createOscillator();
+                var gain = audioCtx.createGain();
+                oscillator.type = 'square';
+                oscillator.frequency.value = 880;
+                gain.gain.value = 0.15;
+                oscillator.connect(gain);
+                gain.connect(audioCtx.destination);
+                oscillator.start();
+            }catch(e){
+                audioCtx = null;
+            }
+        }
+
+        function stopBeep(){
+            if(oscillator){
+                try{ oscillator.stop(); }catch(e){}
+                oscillator.disconnect();
+                oscillator = null;
+            }
+            if(audioCtx){
+                audioCtx.close();
+                audioCtx = null;
+            }
+        }
+
+        function ring(alarm){
+            ringingAlarmId = alarm.id;
+            document.getElementById('ringTime').textContent = alarm.time;
+            document.getElementById('ringQuote').textContent = randomQuote();
+            document.getElementById('ringOverlay').classList.add('show');
+            startBeep();
+        }
+
+        function stopRing(disable){
+            stopBeep();
+            document.getElementById('ringOverlay').classList.remove('show');
+
+            var alarm = alarms.find(function(a){ return a.id === ringingAlarmId; });
+            if(alarm && disable){
+                alarm.enabled = false;
+                saveAlarms();
+                renderAlarms();
+            }
+            ringingAlarmId = null;
+        }
+
+        function snooze(){
+            var alarm = alarms.find(function(a){ return a.id === ringingAlarmId; });
+            stopBeep();
+            document.getElementById('ringOverlay').classList.remove('show');
+
+            if(alarm){
+                var next = new Date();
+                next.setMinutes(next.getMinutes() + 5);
+                alarm.time = pad(next.getHours()) + ':' + pad(next.getMinutes());
+                saveAlarms();
+                renderAlarms();
+            }
+            ringingAlarmId = null;
+        }
+
+        function checkAlarms(){
+            if(ringingAlarmId !== null) return;
+
+            var now = new Date();
+            var current = pad(now.getHours()) + ':' + pad(now.getMinutes());
+
+            if(current === lastCheckedMinute) return;
+            lastCheckedMinute = current;
+
+            var match = alarms.find(function(a){ return a.enabled && a.time === current; });
+            if(match) ring(match);
+        }
+
+        document.getElementById('addBtn').addEventListener('click', addAlarm);
+        document.getElementById('stopBtn').addEventListener('click', function(){ stopRing(true); });
+        document.getElementById('snoozeBtn').addEventListener('click', snooze);
+
+        loadAlarms();
+        renderAlarms();
+        renderClock();
+        setInterval(renderClock, 1000);
+        setInterval(checkAlarms, 1000);
+    </script>
+</body>
+</html>
