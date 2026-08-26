@@ -5,316 +5,460 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#ff4d00">
+    <meta name="theme-color" content="#ff4d1f">
 
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@300;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=RocknRoll+One&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
 
     <title>熱血アラーム</title>
 
     <style>
-        *{ box-sizing: border-box; }
+      :root {
+        --bg: #faf5ec;
+        --surface: #fffaf2;
+        --surface-2: #f2e6d3;
+        --ink: #1f160f;
+        --ink-soft: #7a6a58;
+        --accent: #ff4d1f;
+        --accent-strong: #e63c00;
+        --gold: #b8770a;
+        --border: rgba(31, 22, 15, 0.13);
+        --shadow: rgba(31, 22, 15, 0.10);
+      }
 
-        body{
-            margin: 0;
-            padding: 0;
-            background-color: #111;
-            font-family: 'Open Sans Condensed', sans-serif;
-            color: #fff;
-            -webkit-font-smoothing: antialiased;
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #15100c;
+          --surface: #201811;
+          --surface-2: #2b2018;
+          --ink: #f7ece0;
+          --ink-soft: #b8a58e;
+          --accent: #ff6a3d;
+          --accent-strong: #ff8a5c;
+          --gold: #ffc94d;
+          --border: rgba(247, 236, 224, 0.14);
+          --shadow: rgba(0, 0, 0, 0.4);
         }
+      }
 
-        .phone{
-            max-width: 420px;
-            min-height: 100vh;
-            margin: 0 auto;
-            background: #1c1c1e;
-            position: relative;
-            overflow: hidden;
-        }
+      :root[data-theme="dark"] {
+        --bg: #15100c;
+        --surface: #201811;
+        --surface-2: #2b2018;
+        --ink: #f7ece0;
+        --ink-soft: #b8a58e;
+        --accent: #ff6a3d;
+        --accent-strong: #ff8a5c;
+        --gold: #ffc94d;
+        --border: rgba(247, 236, 224, 0.14);
+        --shadow: rgba(0, 0, 0, 0.4);
+      }
 
-        header{
-            background-color: #ff4d00;
-            color: #fff;
-            width: 100%;
-            padding: env(safe-area-inset-top, 0) 0 0;
-        }
+      * { box-sizing: border-box; }
 
-        header h1{
-            margin: 0;
-            font-size: 25px;
-            padding: 14px 5px;
-            text-align: center;
-            letter-spacing: 1px;
-        }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
 
-        .clock{
-            text-align: center;
-            padding: 30px 20px 10px;
-        }
+      .app {
+        max-width: 460px;
+        margin: 0 auto;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
 
-        .clock .now{
-            font-size: 56px;
-            font-weight: 700;
-            letter-spacing: 2px;
-        }
+      /* ---------- Hero / clock ---------- */
 
-        .clock .today{
-            font-size: 14px;
-            color: #999;
-            margin-top: 4px;
-        }
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 44px 28px 34px;
+        background: linear-gradient(160deg, var(--accent) 0%, var(--accent-strong) 55%, #a8280a 100%);
+        color: #fff8ef;
+        text-align: center;
+      }
 
-        .container{
-            padding: 10px 16px 100px;
-        }
+      .hero-glow {
+        position: absolute;
+        inset: -40% -20% auto -20%;
+        height: 220px;
+        background: radial-gradient(closest-side, rgba(255, 214, 130, 0.55), transparent 70%);
+        filter: blur(10px);
+        pointer-events: none;
+      }
 
-        .section-title{
-            font-size: 16px;
-            color: #999;
-            margin: 20px 0 8px;
-            padding: 0 4px;
-        }
+      .eyebrow {
+        position: relative;
+        margin: 0 0 14px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.28em;
+        color: rgba(255, 248, 239, 0.75);
+      }
 
-        .alarm-card{
-            background: #2c2c2e;
-            border-radius: 10px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+      .clock {
+        position: relative;
+        font-family: 'RocknRoll One', 'Zen Kaku Gothic New', sans-serif;
+        font-size: clamp(48px, 14vw, 64px);
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        text-wrap: balance;
+      }
 
-        .alarm-card .time{
-            font-size: 32px;
-            font-weight: 700;
-        }
+      .date {
+        position: relative;
+        margin-top: 10px;
+        font-size: 14px;
+        color: rgba(255, 248, 239, 0.82);
+        letter-spacing: 0.04em;
+      }
 
-        .alarm-card .time.off{
-            color: #666;
-        }
+      /* ---------- Content ---------- */
 
-        .alarm-card .label{
-            font-size: 12px;
-            color: #999;
-            margin-top: 2px;
-        }
+      .content {
+        flex: 1;
+        padding: 26px 20px 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
 
-        .alarm-card .actions{
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+      .section-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
 
-        .switch{
-            position: relative;
-            width: 46px;
-            height: 28px;
-            display: inline-block;
-        }
+      .section-head h2 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        color: var(--ink-soft);
+      }
 
-        .switch input{
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+      .alarm-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
 
-        .switch .slider{
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #555;
-            border-radius: 28px;
-            transition: .2s;
-        }
+      .alarm-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 1px 2px var(--shadow);
+      }
 
-        .switch .slider:before{
-            position: absolute;
-            content: "";
-            height: 22px;
-            width: 22px;
-            left: 3px;
-            bottom: 3px;
-            background-color: #fff;
-            border-radius: 50%;
-            transition: .2s;
-        }
+      .alarm-time {
+        font-family: 'RocknRoll One', sans-serif;
+        font-size: 30px;
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+      }
 
-        .switch input:checked + .slider{
-            background-color: #34c759;
-        }
+      .alarm-time.muted {
+        color: var(--ink-soft);
+      }
 
-        .switch input:checked + .slider:before{
-            transform: translateX(18px);
-        }
+      .alarm-label {
+        margin-top: 5px;
+        font-size: 12px;
+        color: var(--ink-soft);
+        letter-spacing: 0.04em;
+      }
 
-        .delete-btn{
-            background: none;
-            border: none;
-            color: #ff4d4d;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 0 2px;
-        }
+      .alarm-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
 
-        .add-form{
-            background: #2c2c2e;
-            border-radius: 10px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+      .toggle {
+        position: relative;
+        width: 46px;
+        height: 27px;
+        display: inline-block;
+      }
 
-        .add-form input[type="time"]{
-            font-size: 24px;
-            padding: 8px;
-            border-radius: 6px;
-            border: none;
-            background: #1c1c1e;
-            color: #fff;
-        }
+      .toggle input {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        cursor: pointer;
+      }
 
-        .add-form button{
-            background: #ff4d00;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+      .toggle-track {
+        position: absolute;
+        inset: 0;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        transition: background-color 0.18s ease;
+      }
 
-        .add-form button:active{
-            background: #cc3d00;
-        }
+      .toggle-track::before {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 21px;
+        height: 21px;
+        border-radius: 50%;
+        background: #fff8ef;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+        transition: transform 0.18s ease;
+      }
 
-        .empty{
-            color: #666;
-            text-align: center;
-            padding: 20px;
-            font-size: 14px;
-        }
+      .toggle input:checked + .toggle-track {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
 
-        /* --- Alarm ring overlay --- */
-        .ring-overlay{
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #ff4d00;
-            z-index: 1000;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            text-align: center;
-            animation: flash 1s ease-in-out infinite;
-        }
+      .toggle input:checked + .toggle-track::before {
+        transform: translateX(19px);
+      }
 
-        .ring-overlay.show{
-            display: flex;
-        }
+      .toggle input:focus-visible + .toggle-track {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
 
-        @keyframes flash{
-            0%, 100%{ background-color: #ff4d00; }
-            50%{ background-color: #ff8a00; }
-        }
+      .icon-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--ink-soft);
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-        .ring-overlay .ring-time{
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
+      .icon-btn:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
 
-        .ring-overlay .quote{
-            font-size: 30px;
-            font-weight: 700;
-            line-height: 1.4;
-            margin-bottom: 40px;
-        }
+      .icon-btn:focus-visible,
+      button:focus-visible,
+      input:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
 
-        .ring-overlay .credit{
-            font-size: 13px;
-            opacity: .8;
-            margin-top: -30px;
-            margin-bottom: 30px;
-        }
+      .empty {
+        color: var(--ink-soft);
+        font-size: 14px;
+        text-align: center;
+        padding: 22px 0;
+        border: 1px dashed var(--border);
+        border-radius: 14px;
+      }
 
-        .ring-buttons{
-            display: flex;
-            gap: 16px;
-            width: 100%;
-            max-width: 320px;
-        }
+      .add-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
 
-        .ring-buttons button{
-            flex: 1;
-            padding: 16px;
-            border-radius: 10px;
-            border: none;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-        }
+      .add-card input[type="time"] {
+        flex: 1;
+        min-width: 0;
+        font-family: 'RocknRoll One', sans-serif;
+        font-size: 22px;
+        font-variant-numeric: tabular-nums;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--surface-2);
+        color: var(--ink);
+      }
 
-        #snoozeBtn{
-            background: rgba(255,255,255,.25);
-            color: #fff;
-        }
+      .btn-accent {
+        flex-shrink: 0;
+        background: var(--accent);
+        color: #fff8ef;
+        border: none;
+        border-radius: 10px;
+        padding: 13px 20px;
+        font-family: 'Zen Kaku Gothic New', sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+      }
 
-        #stopBtn{
-            background: #fff;
-            color: #ff4d00;
-        }
+      .btn-accent:hover {
+        background: var(--accent-strong);
+      }
 
-        footer.disclaimer{
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            max-width: 420px;
-            margin: 0 auto;
-            font-size: 11px;
-            color: #666;
-            text-align: center;
-            padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0));
-            background: #1c1c1e;
-        }
+      .disclaimer {
+        margin: 0;
+        font-size: 11.5px;
+        line-height: 1.6;
+        color: var(--ink-soft);
+        text-align: center;
+        padding: 0 6px;
+      }
+
+      /* ---------- Ring takeover ---------- */
+
+      .ring {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        background: radial-gradient(120% 100% at 50% 0%, #ff8a3d 0%, #ff4d1f 45%, #b8270b 100%);
+        color: #fff8ef;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 24px;
+        text-align: center;
+        overflow: hidden;
+      }
+
+      .ring.show {
+        display: flex;
+      }
+
+      .ring-rays {
+        position: absolute;
+        width: 900px;
+        height: 900px;
+        background: repeating-conic-gradient(from 0deg, rgba(255, 226, 158, 0.16) 0deg 6deg, transparent 6deg 18deg);
+        animation: spin 40s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .ring-inner {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 380px;
+      }
+
+      .ring-time {
+        font-family: 'RocknRoll One', sans-serif;
+        font-size: 40px;
+        font-variant-numeric: tabular-nums;
+        opacity: 0.9;
+        margin-bottom: 18px;
+        animation: pulse 1.6s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.06); }
+      }
+
+      .ring-quote {
+        font-family: 'RocknRoll One', sans-serif;
+        font-size: clamp(26px, 7.5vw, 34px);
+        line-height: 1.45;
+        text-wrap: balance;
+        margin: 0 0 14px;
+      }
+
+      .ring-credit {
+        margin: 0 0 36px;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        color: #ffe2b0;
+      }
+
+      .ring-actions {
+        display: flex;
+        gap: 14px;
+        width: 100%;
+      }
+
+      .ring-actions button {
+        flex: 1;
+        padding: 16px;
+        border-radius: 12px;
+        border: none;
+        font-family: 'Zen Kaku Gothic New', sans-serif;
+        font-weight: 900;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .btn-ghost {
+        background: rgba(255, 248, 239, 0.16);
+        color: #fff8ef;
+        border: 1px solid rgba(255, 248, 239, 0.4) !important;
+      }
+
+      .btn-solid {
+        background: #fff8ef;
+        color: #c23000;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .ring-rays { animation: none; }
+        .ring-time { animation: none; }
+      }
     </style>
 </head>
 <body>
-    <div class="phone">
-        <header>
-            <h1>熱血アラーム</h1>
-        </header>
-
-        <div class="clock">
-            <div class="now" id="nowClock">00:00:00</div>
-            <div class="today" id="nowDate">----年--月--日</div>
+    <div class="app">
+        <div class="hero">
+            <div class="hero-glow" aria-hidden="true"></div>
+            <p class="eyebrow">GOOD MORNING</p>
+            <div class="clock" id="nowClock">00:00:00</div>
+            <div class="date" id="nowDate">----年--月--日</div>
         </div>
 
-        <div class="container">
-            <div class="section-title">アラーム</div>
-            <div id="alarmList"></div>
+        <main class="content">
+            <section>
+                <div class="section-head"><h2>アラーム</h2></div>
+                <div class="alarm-list" id="alarmList"></div>
+            </section>
 
-            <div class="section-title">アラームを追加</div>
-            <div class="add-form">
-                <input type="time" id="newTime" value="06:30">
-                <button id="addBtn">追加する</button>
-            </div>
-        </div>
+            <section>
+                <div class="section-head"><h2>追加する</h2></div>
+                <div class="add-card">
+                    <input type="time" id="newTime" value="06:30" aria-label="アラーム時刻">
+                    <button id="addBtn" class="btn-accent">追加</button>
+                </div>
+            </section>
 
-        <footer class="disclaimer">
-            ※本アプリの名言は松岡修造さんの語録をモチーフにしたファン制作の非公式サンプルです。
-        </footer>
+            <p class="disclaimer">名言は松岡修造さんの語録をモチーフにしたファン制作の非公式サンプルです。目を覚ますモチベーション演出としてお楽しみください。<br>ブラウザのタブを開いたままにしておくと鳴動します。ホーム画面に追加してご利用ください。</p>
+        </main>
 
-        <div class="ring-overlay" id="ringOverlay">
-            <div class="ring-time" id="ringTime">06:30</div>
-            <div class="quote" id="ringQuote">起きた瞬間から、もう試合は始まってるんだよ！</div>
-            <div class="credit">— 熱血格言（非公式）</div>
-            <div class="ring-buttons">
-                <button id="snoozeBtn">あと5分</button>
-                <button id="stopBtn">起きる！</button>
+        <div class="ring" id="ringOverlay" role="alertdialog" aria-modal="true" aria-hidden="true">
+            <div class="ring-rays" aria-hidden="true"></div>
+            <div class="ring-inner">
+                <div class="ring-time" id="ringTime">06:30</div>
+                <p class="ring-quote" id="ringQuote">起きた瞬間から、もう試合は始まってるんだよ！</p>
+                <p class="ring-credit">熱血格言（非公式）</p>
+                <div class="ring-actions">
+                    <button id="snoozeBtn" class="btn-ghost">あと5分</button>
+                    <button id="stopBtn" class="btn-solid">起きる！</button>
+                </div>
             </div>
         </div>
     </div>
@@ -339,6 +483,7 @@
         var alarms = [];
         var audioCtx = null;
         var oscillator = null;
+        var gainNode = null;
         var ringingAlarmId = null;
         var lastCheckedMinute = null;
 
@@ -352,7 +497,7 @@
         }
 
         function saveAlarms(){
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(alarms));
+            try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(alarms)); }catch(e){}
         }
 
         function pad(n){
@@ -374,7 +519,7 @@
             if(alarms.length === 0){
                 var empty = document.createElement('div');
                 empty.className = 'empty';
-                empty.textContent = 'アラームがありません';
+                empty.textContent = 'まだアラームがありません';
                 list.appendChild(empty);
                 return;
             }
@@ -387,47 +532,49 @@
                 var card = document.createElement('div');
                 card.className = 'alarm-card';
 
-                var left = document.createElement('div');
+                var info = document.createElement('div');
                 var time = document.createElement('div');
-                time.className = 'time' + (alarm.enabled ? '' : ' off');
+                time.className = 'alarm-time' + (alarm.enabled ? '' : ' muted');
                 time.textContent = alarm.time;
                 var label = document.createElement('div');
-                label.className = 'label';
+                label.className = 'alarm-label';
                 label.textContent = alarm.enabled ? '有効' : '無効';
-                left.appendChild(time);
-                left.appendChild(label);
+                info.appendChild(time);
+                info.appendChild(label);
 
                 var actions = document.createElement('div');
-                actions.className = 'actions';
+                actions.className = 'alarm-actions';
 
-                var switchLabel = document.createElement('label');
-                switchLabel.className = 'switch';
+                var toggleLabel = document.createElement('label');
+                toggleLabel.className = 'toggle';
                 var checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.checked = alarm.enabled;
+                checkbox.setAttribute('aria-label', alarm.time + 'のアラームを' + (alarm.enabled ? '無効化' : '有効化'));
                 checkbox.addEventListener('change', function(){
                     alarm.enabled = checkbox.checked;
                     saveAlarms();
                     renderAlarms();
                 });
-                var slider = document.createElement('span');
-                slider.className = 'slider';
-                switchLabel.appendChild(checkbox);
-                switchLabel.appendChild(slider);
+                var track = document.createElement('span');
+                track.className = 'toggle-track';
+                toggleLabel.appendChild(checkbox);
+                toggleLabel.appendChild(track);
 
                 var delBtn = document.createElement('button');
-                delBtn.className = 'delete-btn';
+                delBtn.className = 'icon-btn';
                 delBtn.textContent = '✕';
+                delBtn.setAttribute('aria-label', alarm.time + 'のアラームを削除');
                 delBtn.addEventListener('click', function(){
                     alarms = alarms.filter(function(a){ return a.id !== alarm.id; });
                     saveAlarms();
                     renderAlarms();
                 });
 
-                actions.appendChild(switchLabel);
+                actions.appendChild(toggleLabel);
                 actions.appendChild(delBtn);
 
-                card.appendChild(left);
+                card.appendChild(info);
                 card.appendChild(actions);
                 list.appendChild(card);
             });
@@ -450,21 +597,28 @@
             return QUOTES[Math.floor(Math.random() * QUOTES.length)];
         }
 
-        function startBeep(){
+        function unlockAudio(){
             if(audioCtx) return;
             try{
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                oscillator = audioCtx.createOscillator();
-                var gain = audioCtx.createGain();
-                oscillator.type = 'square';
-                oscillator.frequency.value = 880;
-                gain.gain.value = 0.15;
-                oscillator.connect(gain);
-                gain.connect(audioCtx.destination);
-                oscillator.start();
             }catch(e){
                 audioCtx = null;
             }
+        }
+
+        function startBeep(){
+            if(!audioCtx) unlockAudio();
+            if(!audioCtx) return;
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+
+            oscillator = audioCtx.createOscillator();
+            gainNode = audioCtx.createGain();
+            oscillator.type = 'square';
+            oscillator.frequency.value = 880;
+            gainNode.gain.value = 0.15;
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
         }
 
         function stopBeep(){
@@ -473,9 +627,9 @@
                 oscillator.disconnect();
                 oscillator = null;
             }
-            if(audioCtx){
-                audioCtx.close();
-                audioCtx = null;
+            if(gainNode){
+                gainNode.disconnect();
+                gainNode = null;
             }
         }
 
@@ -483,13 +637,17 @@
             ringingAlarmId = alarm.id;
             document.getElementById('ringTime').textContent = alarm.time;
             document.getElementById('ringQuote').textContent = randomQuote();
-            document.getElementById('ringOverlay').classList.add('show');
+            var overlay = document.getElementById('ringOverlay');
+            overlay.classList.add('show');
+            overlay.setAttribute('aria-hidden', 'false');
             startBeep();
         }
 
         function stopRing(disable){
             stopBeep();
-            document.getElementById('ringOverlay').classList.remove('show');
+            var overlay = document.getElementById('ringOverlay');
+            overlay.classList.remove('show');
+            overlay.setAttribute('aria-hidden', 'true');
 
             var alarm = alarms.find(function(a){ return a.id === ringingAlarmId; });
             if(alarm && disable){
@@ -503,7 +661,9 @@
         function snooze(){
             var alarm = alarms.find(function(a){ return a.id === ringingAlarmId; });
             stopBeep();
-            document.getElementById('ringOverlay').classList.remove('show');
+            var overlay = document.getElementById('ringOverlay');
+            overlay.classList.remove('show');
+            overlay.setAttribute('aria-hidden', 'true');
 
             if(alarm){
                 var next = new Date();
@@ -531,6 +691,7 @@
         document.getElementById('addBtn').addEventListener('click', addAlarm);
         document.getElementById('stopBtn').addEventListener('click', function(){ stopRing(true); });
         document.getElementById('snoozeBtn').addEventListener('click', snooze);
+        document.addEventListener('pointerdown', unlockAudio, { once: true });
 
         loadAlarms();
         renderAlarms();
