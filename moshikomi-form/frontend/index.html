@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>新規お申し込み</title>
+</head>
+<body>
+    <header class="site-header">
+        <div class="site-header__inner">
+            <span class="site-header__logo">Sample Bank</span>
+            <span class="site-header__title">新規お申し込み</span>
+        </div>
+    </header>
+
+    <main class="page">
+        <div class="card">
+            <ol class="stepper" id="stepper">
+                <li class="stepper__item is-active" data-step="1">
+                    <span class="stepper__circle">1</span>
+                    <span class="stepper__label">ご入力</span>
+                </li>
+                <li class="stepper__item" data-step="2">
+                    <span class="stepper__circle">2</span>
+                    <span class="stepper__label">ご確認</span>
+                </li>
+                <li class="stepper__item" data-step="3">
+                    <span class="stepper__circle">3</span>
+                    <span class="stepper__label">完了</span>
+                </li>
+            </ol>
+
+            <!-- Step 1: 入力 -->
+            <section class="step" id="step-input">
+                <h1 class="step__title">お申し込み情報の入力</h1>
+                <p class="step__lead">お名前とメールアドレスをご入力ください。<br>ご入力いただいたメールアドレス宛に受付確認のメールをお送りします。</p>
+
+                <form id="apply-form" novalidate>
+                    <div class="field">
+                        <label class="field__label" for="name">
+                            お名前
+                            <span class="field__required">必須</span>
+                        </label>
+                        <input class="field__input" type="text" id="name" name="name" maxlength="50" placeholder="例：山田 太郎" autocomplete="name" required>
+                        <p class="field__error" id="name-error"></p>
+                    </div>
+
+                    <div class="field">
+                        <label class="field__label" for="email">
+                            メールアドレス
+                            <span class="field__required">必須</span>
+                        </label>
+                        <input class="field__input" type="email" id="email" name="email" maxlength="254" placeholder="例：taro.yamada@example.com" autocomplete="email" required>
+                        <p class="field__hint">半角英数字でご入力ください。確認メールの送信先になります。</p>
+                        <p class="field__error" id="email-error"></p>
+                    </div>
+
+                    <div class="field field--checkbox">
+                        <label class="checkbox">
+                            <input type="checkbox" id="agree" name="agree" required>
+                            <span><a href="#" target="_blank" rel="noopener">利用規約</a>および<a href="#" target="_blank" rel="noopener">個人情報の取り扱い</a>に同意する</span>
+                        </label>
+                        <p class="field__error" id="agree-error"></p>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn--primary">入力内容を確認する</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Step 2: 確認 -->
+            <section class="step is-hidden" id="step-confirm">
+                <h1 class="step__title">入力内容のご確認</h1>
+                <p class="step__lead">以下の内容でお申し込みを受け付けます。内容をご確認のうえ、よろしければ「申し込む」を押してください。</p>
+
+                <dl class="summary">
+                    <div class="summary__row">
+                        <dt>お名前</dt>
+                        <dd id="confirm-name"></dd>
+                    </div>
+                    <div class="summary__row">
+                        <dt>メールアドレス</dt>
+                        <dd id="confirm-email"></dd>
+                    </div>
+                </dl>
+
+                <p class="step__error" id="submit-error"></p>
+
+                <div class="actions actions--split">
+                    <button type="button" class="btn btn--secondary" id="btn-back">内容を修正する</button>
+                    <button type="button" class="btn btn--primary" id="btn-submit">
+                        <span id="btn-submit-label">この内容で申し込む</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Step 3: 完了 -->
+            <section class="step is-hidden" id="step-complete">
+                <div class="complete-icon">&#10003;</div>
+                <h1 class="step__title">お申し込みが完了しました</h1>
+                <p class="step__lead" id="complete-message">
+                    お申し込みいただき、誠にありがとうございます。<br>
+                    ご入力いただいたメールアドレス宛に受付確認メールをお送りしました。
+                </p>
+                <p class="step__note">メールが届かない場合は、迷惑メールフォルダをご確認いただくか、お手数ですが再度お申し込みください。</p>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2026 Sample Bank. このフォームはデモ用サンプルです。</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

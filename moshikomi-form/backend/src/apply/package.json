@@ -1,0 +1,12 @@
+{
+  "name": "apply-function",
+  "version": "1.0.0",
+  "private": true,
+  "description": "申し込みフォームの受付処理 Lambda",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.700.0",
+    "@aws-sdk/lib-dynamodb": "^3.700.0",
+    "@aws-sdk/client-ses": "^3.700.0"
+  }
+}

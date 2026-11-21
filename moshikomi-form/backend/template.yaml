@@ -1,0 +1,84 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  申し込みフォームのバックエンド一式。
+  API Gateway -> Lambda -> DynamoDB への保存、および SES による受付確認メール送信を行う。
+
+Parameters:
+  SenderEmail:
+    Type: String
+    Description: >
+      確認メールの送信元アドレス。SES で検証済みの ID (メールアドレス、またはそのドメイン) を指定してください。
+      例: no-reply@example.com
+  AllowedOrigin:
+    Type: String
+    Default: "*"
+    Description: >
+      フロントエンドを配信するオリジン (CORS の Access-Control-Allow-Origin に使用)。
+      本番運用では "*" ではなく実際の配信ドメイン (例: https://example.com) に限定してください。
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Timeout: 10
+    MemorySize: 128
+    Architectures:
+      - arm64
+
+Resources:
+  ApplicationsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-applications"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: applicationId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: applicationId
+          KeyType: HASH
+
+  MoshikomiApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'POST,OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: !Sub "'${AllowedOrigin}'"
+
+  ApplyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/apply/
+      Handler: index.handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ApplicationsTable
+          SENDER_EMAIL: !Ref SenderEmail
+          ALLOWED_ORIGIN: !Ref AllowedOrigin
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ApplicationsTable
+        - Statement:
+            - Sid: AllowSesSend
+              Effect: Allow
+              Action:
+                - ses:SendEmail
+                - ses:SendRawEmail
+              Resource: !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/*"
+      Events:
+        Apply:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MoshikomiApi
+            Path: /apply
+            Method: post
+
+Outputs:
+  ApiEndpoint:
+    Description: フロントエンドの script.js に設定する申し込み送信先 URL
+    Value: !Sub "https://${MoshikomiApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/apply"
+  ApplicationsTableName:
+    Description: 申し込みデータを保存する DynamoDB テーブル名
+    Value: !Ref ApplicationsTable
